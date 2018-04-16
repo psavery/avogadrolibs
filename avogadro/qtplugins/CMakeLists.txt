@@ -120,8 +120,10 @@ add_subdirectory(spectra)
 add_subdirectory(vrml)
 add_subdirectory(workflows)
 
+# Plugins that require VTK
 if(USE_VTK)
   add_subdirectory(plotxrd)
+  add_subdirectory(yaehmop)
 endif()
 
 if(USE_MOLEQUEUE)

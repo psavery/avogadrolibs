@@ -1,0 +1,30 @@
+find_package(VTK REQUIRED)
+include(${VTK_USE_FILE})
+
+include_directories(SYSTEM ${VTK_INCLUDE_DIRS})
+
+# Download the executable if we are not to use the system one
+if(NOT USE_SYSTEM_YAEHMOP)
+  include(DownloadYaehmop)
+  DownloadYaehmop()
+endif(NOT USE_SYSTEM_YAEHMOP)
+
+set(yaehmop_srcs
+  banddialog.cpp
+  yaehmop.cpp
+)
+
+set(yaehmop_uis
+  banddialog.ui
+)
+
+avogadro_plugin(Yaehmop
+  "Use yaehmop to perform extended Hückel calculations."
+  ExtensionPlugin
+  yaehmop.h
+  Yaehmop
+  "${yaehmop_srcs}"
+  "${yaehmop_uis}"
+)
+
+target_link_libraries(Yaehmop LINK_PRIVATE ${VTK_LIBRARIES})
