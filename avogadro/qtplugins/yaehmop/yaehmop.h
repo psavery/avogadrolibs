@@ -21,6 +21,8 @@
 
 #include <memory>
 
+#include "yaehmopsettings.h"
+
 // Forward declarations
 class QByteArray;
 class QStringList;
@@ -57,20 +59,27 @@ private slots:
 
 private:
 
+  void readSettings();
+  void writeSettings();
+
+  void calculateBandStructure();
+
+  QString createGeometryAndLatticeInput() const;
+
   // Use QProcess to execute yaehmop
   // If the YAEHMOP_EXECUTABLE environment variable is set, that will be
   // used for the executable. Otherwise, it will search for the executable in
   // some common places and use it if it can be found.
-  static bool executeYaehmop(const QStringList& args,
-                             const QByteArray& input, QByteArray& output,
+  static bool executeYaehmop(const QByteArray& input, QByteArray& output,
                              QString& err);
 
   QList<QAction*> m_actions;
   QtGui::Molecule* m_molecule;
 
+  YaehmopSettings m_yaehmopSettings;
+
   std::unique_ptr<BandDialog> m_bandDialog;
   std::unique_ptr<QAction> m_displayBandDialogAction;
-
 };
 
 inline QString Yaehmop::description() const

@@ -14,44 +14,43 @@
 
 ******************************************************************************/
 
-#ifndef AVOGADRO_QTPLUGINS_YAEHMOPBANDDIALOG_H
-#define AVOGADRO_QTPLUGINS_YAEHMOPBANDDIALOG_H
+#ifndef AVOGADRO_QTPLUGINS_YAEHMOPSETTINGS_H
+#define AVOGADRO_QTPLUGINS_YAEHMOPSETTINGS_H
 
-#include <memory>
-
-#include <QDialog>
-
-#include "yaehmopsettings.h"
+#include <QString>
 
 namespace Avogadro {
 namespace QtPlugins {
 
-namespace Ui {
-class BandDialog;
-}
+struct YaehmopSettings {
+  YaehmopSettings() :
+    numBandKPoints(40),
+    specialKPoints("GM 0 0 0"),
+    displayYaehmopInput(false),
+    displayData(false),
+    limitY(false),
+    minY(0.0),
+    maxY(0.0),
+    plotFermi(false),
+    fermi(0.0),
+    zeroFermi(false),
+    numDim(3)
+  {
+  };
 
-/**
- * @brief Dialog to perform a band structure calculation with yaehmop.
- */
-class BandDialog : public QDialog
-{
-  Q_OBJECT
-
-public:
-  explicit BandDialog(QWidget* parent, YaehmopSettings& yaehmopSettings);
-  ~BandDialog();
-
-public slots:
-  int exec() override;
-
-protected slots:
-  void accept() override;
-
-private:
-  std::unique_ptr<Ui::BandDialog> m_ui;
-  YaehmopSettings& m_yaehmopSettings;
+  unsigned long long numBandKPoints;
+  QString specialKPoints;
+  bool displayYaehmopInput;
+  bool displayData;
+  bool limitY;
+  double minY;
+  double maxY;
+  bool plotFermi;
+  double fermi;
+  bool zeroFermi;
+  unsigned short numDim;
 };
 
 } // namespace QtPlugins
 } // namespace Avogadro
-#endif // AVOGADRO_QTPLUGINS_YAEHMOPBANDDIALOG_H
+#endif // AVOGADRO_QTPLUGINS_YAEHMOPSETTINGS_H
