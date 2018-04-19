@@ -12,12 +12,12 @@ macro(DownloadYaehmop)
 
   # If it already exists, don't download it again
   if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/bin/${YAEHMOP_NAME}")
-    set(YAEHMOP_V "3.0.2")
+    set(YAEHMOP_V "3.0.3")
 
     # Linux
     if(UNIX AND NOT APPLE)
       set(YAEHMOP_DOWNLOAD_LOCATION "https://github.com/psavery/yaehmop/releases/download/${YAEHMOP_V}/linux64-yaehmop.tgz")
-      set(MD5 "e878e96ea891d843ddb539b36da67117")
+      set(MD5 "7f3f71c076d8604b98a7e60c351febf2")
 
     # Apple
     elseif(APPLE)
@@ -39,19 +39,14 @@ macro(DownloadYaehmop)
     # Install to a temporary directory so we can copy and change file
     # permissions
     file(DOWNLOAD "${YAEHMOP_DOWNLOAD_LOCATION}"
-         "${CMAKE_CURRENT_BINARY_DIR}/tmp/${YAEHMOP_NAME}"
+         "${CMAKE_CURRENT_BINARY_DIR}/bin/${YAEHMOP_NAME}.tgz"
          SHOW_PROGRESS
          EXPECTED_MD5 ${MD5})
 
-    # We need to change the permissions
-    file(COPY "${CMAKE_CURRENT_BINARY_DIR}/tmp/${YAEHMOP_NAME}"
-         DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/bin/"
-         FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                          GROUP_READ GROUP_EXECUTE
-                          WORLD_READ WORLD_EXECUTE)
+    execute_process(COMMAND ${CMAKE_COMMAND} -E tar xzvf ${YAEHMOP_NAME}.tgz
+                    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin")
 
-    # Now remove the temporary directory
-    file(REMOVE_RECURSE "${CMAKE_CURRENT_BINARY_DIR}/tmp")
+    file(REMOVE "${CMAKE_CURRENT_BINARY_DIR}/bin/${YAEHMOP_NAME}.tgz")
 
   endif(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/bin/${YAEHMOP_NAME}")
 
