@@ -396,7 +396,7 @@ bool Yaehmop::executeYaehmop(const QByteArray& input, QByteArray& output,
   if (exitStatus == QProcess::CrashExit) {
     err = tr("Error: " + program.toLocal8Bit() + " crashed!");
     qDebug() << err;
-    qDebug() << "Output is as follows:\n" << output;
+    qDebug() << "Output is as follows:\n" << qPrintable(output);
     return false;
   }
 
@@ -405,12 +405,12 @@ bool Yaehmop::executeYaehmop(const QByteArray& input, QByteArray& output,
              " finished abnormally with exit code " +
              QString::number(exitStatus).toLocal8Bit());
     qDebug() << err;
-    qDebug() << "Output is as follows:\n" << output;
+    qDebug() << "Output is as follows:\n" << qPrintable(output);
     return false;
   }
 
 #ifdef AVOGADRO_YAEHMOP_EXECUTE_DEBUG
-  qDebug() << "executeYaehmop() output is:\n" << output;
+  qDebug() << "executeYaehmop() output is:\n" << qPrintable(output);
 #endif
 
   // We did it!
