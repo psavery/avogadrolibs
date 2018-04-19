@@ -336,7 +336,7 @@ bool Yaehmop::executeYaehmop(const QByteArray& input, QByteArray& output,
                              QString& err)
 {
 #ifdef AVOGADRO_YAEHMOP_EXECUTE_DEBUG
-  qDebug() << "executeYaehmop() input is:\n" << input;
+  qDebug() << "executeYaehmop() input is:\n" << qPrintable(input);
 #endif
 
   QString program;
@@ -386,7 +386,7 @@ bool Yaehmop::executeYaehmop(const QByteArray& input, QByteArray& output,
     err = tr("Error: " + program.toLocal8Bit() + " failed to finish");
     qDebug() << err;
     output = p.readAll();
-    qDebug() << "Output is as follows:\n" << output;
+    qDebug() << "Output is as follows:\n" << qPrintable(output);
     return false;
   }
 
