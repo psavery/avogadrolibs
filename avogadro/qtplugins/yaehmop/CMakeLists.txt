@@ -12,6 +12,7 @@ endif(NOT USE_SYSTEM_YAEHMOP)
 set(yaehmop_srcs
   banddialog.cpp
   yaehmop.cpp
+  yaehmopout.cpp
 )
 
 set(yaehmop_uis
