@@ -238,6 +238,22 @@ void Yaehmop::calculateBandStructure()
     qDebug() << message;
   }
 
+  int numKPoints = kpoints.size();
+  int numOrbitals = bands.size();
+  int numSpecialKPoints = specialKPoints.size();
+
+  // If there is only one special k point, there is nothing to graph. Just
+  // return.
+  if (numSpecialKPoints <= 1) {
+    QString message =
+      tr("Only one special k point was found in Yaehmop output! Two or more "
+         "are required!");
+    QMessageBox::warning(nullptr, tr("Avogadro2"), message);
+    qDebug() << message;
+    return;
+  }
+
+
   qDebug() << "bands.size() is" << bands.size();
 }
 
