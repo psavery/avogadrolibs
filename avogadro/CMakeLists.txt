@@ -55,6 +55,7 @@ endif()
 
 if(USE_VTK)
   add_subdirectory(vtk)
+  include_directories(${CMAKE_CURRENT_BINARY_DIR}/vtk)
 endif()
 if(USE_PROTOCALL)
   add_subdirectory(protocall)

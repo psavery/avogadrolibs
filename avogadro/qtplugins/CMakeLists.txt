@@ -210,3 +210,6 @@ set(SOURCES
 avogadro_add_library(AvogadroQtPlugins ${HEADERS} ${SOURCES})
 target_link_libraries(AvogadroQtPlugins LINK_PUBLIC ${Qt5Core_LIBRARIES}
   LINK_PRIVATE ${AvogadroLibs_STATIC_PLUGINS} AvogadroQtGui)
+if(USE_VTK)
+  target_link_libraries(AvogadroQtPlugins LINK_PRIVATE AvogadroVtk)
+endif(USE_VTK)

@@ -14,6 +14,9 @@
 
 ******************************************************************************/
 
+#include <iostream>
+#include <string>
+
 #include <vtkAxis.h>
 #include <vtkChartXY.h>
 #include <vtkContextScene.h>
@@ -24,39 +27,56 @@
 #include <vtkPlot.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRenderer.h>
+#include <vtkSmartPointer.h>
 #include <vtkTable.h>
 #include <vtkTextProperty.h>
 
 #include <QVTKOpenGLWidget.h>
 
-#include "xrdvtkplot.h"
+#include "vtkplot.h"
+
+using std::array;
+using std::string;
+using std::vector;
 
 namespace Avogadro {
-namespace QtPlugins {
+namespace VTK {
 
-void XrdVtkPlot::generatePlot(
-  const std::vector<std::pair<double, double>>& data)
+void VtkPlot::generatePlot(const vector<vector<double>>& data,
+                           const vector<string>& lineLabels,
+                           const vector<array<double, 4>>& lineColors,
+                           const char* xTitle, const char* yTitle,
+                           const char* windowName)
 {
-  // Save the axes titles
-  const char* xTitle = "2 Theta";
-  const char* yTitle = "Intensity";
+  if (data.size() < 2) {
+    std::cerr << "Error in " << __FUNCTION__
+              << ": data must be of size 2 or greater!\n";
+    return;
+  }
 
-  // Create a table and add two columns
+  // Create a table and add the data as columns
   vtkNew<vtkTable> table;
 
-  vtkNew<vtkFloatArray> arrX;
-  arrX->SetName(xTitle);
-  table->AddColumn(arrX);
+  vector<vtkSmartPointer<vtkFloatArray>> vtkArrays;
+  for (size_t i = 0; i < data.size(); ++i) {
+    vtkArrays.push_back(
+      vtkSmartPointer<vtkFloatArray>(vtkNew<vtkFloatArray>()));
+    table->AddColumn(vtkArrays.back());
+  }
 
-  vtkNew<vtkFloatArray> arrY;
-  arrY->SetName(yTitle);
-  table->AddColumn(arrY);
+  // Find the largest number of rows and set that to be the number of rows
+  size_t numRows = 0;
+  for (size_t i = 0; i < data.size(); ++i) {
+    if (data[i].size() > numRows)
+      numRows = data[i].size();
+  }
 
   // Put the data in the table
-  table->SetNumberOfRows(data.size());
+  table->SetNumberOfRows(numRows);
   for (size_t i = 0; i < data.size(); ++i) {
-    table->SetValue(i, 0, data[i].first);
-    table->SetValue(i, 1, data[i].second);
+    for (size_t j = 0; j < data[i].size(); ++j) {
+      table->SetValue(j, i, data[i][j]);
+    }
   }
 
   // Set up the view
@@ -70,7 +90,7 @@ void XrdVtkPlot::generatePlot(
   view->SetRenderWindow(renderWindow);
   view->GetRenderer()->SetBackground(1.0, 1.0, 1.0);
   view->GetRenderWindow()->SetSize(600, 600);
-  view->GetRenderWindow()->SetWindowName("Theoretical XRD Pattern");
+  view->GetRenderWindow()->SetWindowName(windowName);
 
   // Add the chart
   vtkNew<vtkChartXY> chart;
@@ -93,17 +113,29 @@ void XrdVtkPlot::generatePlot(
 
   // Adjust the range on the x axis
   bottomAxis->SetBehavior(vtkAxis::FIXED);
-  bottomAxis->SetRange(data.front().first, data.back().first);
+  bottomAxis->SetRange(data[0].front(), data[0].back());
 
-  // Add the data to the chart
-  vtkPlot* line = chart->AddPlot(vtkChart::LINE);
-  line->SetInputData(table, 0, 1);
-  line->SetColor(255, 0, 0, 255);
-  line->SetWidth(2.0);
+  // Add the lines to the chart
+  for (size_t i = 1; i < data.size(); ++i) {
+    vtkPlot* line = chart->AddPlot(vtkChart::LINE);
+    line->SetInputData(table, 0, i);
+
+    // If we have a label for this line, set it
+    if (i <= lineLabels.size())
+      line->SetLabel(lineLabels[i - 1]);
+
+    // If we have a color for this line, set it (rgba)
+    if (i <= lineColors.size()) {
+      line->SetColor(lineColors[i - 1][0], lineColors[i - 1][1],
+                     lineColors[i - 1][2], lineColors[i - 1][3]);
+    }
+
+    line->SetWidth(2.0);
+  }
 
   // Start the widget, we probably want to improve this in future.
   widget->show();
 }
 
-} // namespace QtPlugins
+} // namespace VTK
 } // namespace Avogadro

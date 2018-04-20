@@ -11,27 +11,25 @@ endif()
 
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 
-find_package(VTK
-  COMPONENTS
-    vtkRenderingOpenGL2 vtkGUISupportQt vtkDomainsChemistry
-    vtkRenderingVolumeOpenGL2 vtkViewsCore vtkRenderingFreeType
-  REQUIRED)
+find_package(VTK REQUIRED)
+include(${VTK_USE_FILE})
 include_directories(SYSTEM ${VTK_INCLUDE_DIRS})
 set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS ${VTK_DEFINITIONS})
 
 set(HEADERS
   vtkAvogadroActor.h
   vtkglwidget.h
+  vtkplot.h
 )
 
 set(SOURCES
   vtkAvogadroActor.cxx
   vtkglwidget.cpp
+  vtkplot.cpp
 )
 
 avogadro_add_library(AvogadroVtk ${HEADERS} ${SOURCES})
 qt5_use_modules(AvogadroVtk Widgets)
 set_target_properties(AvogadroVtk PROPERTIES AUTOMOC TRUE)
 target_link_libraries(AvogadroVtk AvogadroRendering AvogadroQtGui
-  vtkRenderingOpenGL2 vtkGUISupportQt vtkRenderingVolumeOpenGL2
-  vtkRenderingFreeType vtkInteractionStyle)
+                      ${VTK_LIBRARIES})

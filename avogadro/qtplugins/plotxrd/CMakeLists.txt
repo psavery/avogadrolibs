@@ -1,8 +1,3 @@
-find_package(VTK REQUIRED)
-include(${VTK_USE_FILE})
-
-include_directories(SYSTEM ${VTK_INCLUDE_DIRS})
-
 # Download the executable if we are not to use the system one
 if(NOT USE_SYSTEM_GENXRDPATTERN)
   include(DownloadGenXrdPattern)
@@ -12,7 +7,6 @@ endif(NOT USE_SYSTEM_GENXRDPATTERN)
 set(plotxrd_srcs
   plotxrd.cpp
   xrdoptionsdialog.cpp
-  xrdvtkplot.cpp
 )
 
 set(plotxrd_uis
@@ -27,5 +21,3 @@ avogadro_plugin(PlotXrd
   "${plotxrd_srcs}"
   "${plotxrd_uis}"
 )
-
-target_link_libraries(PlotXrd LINK_PRIVATE ${VTK_LIBRARIES})
