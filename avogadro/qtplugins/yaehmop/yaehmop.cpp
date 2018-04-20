@@ -32,6 +32,8 @@
 #include <avogadro/qtgui/molecule.h>
 
 #include "banddialog.h"
+#include "yaehmopout.h"
+
 #include "yaehmop.h"
 
 using Avogadro::Core::Array;
@@ -226,7 +228,17 @@ void Yaehmop::calculateBandStructure()
     return;
   }
 
-  // Now generate a plot with the data
+  // Now, read the output
+  QVector<QVector<double>> bands;
+  QVector<Vector3> kpoints;
+  QVector<specialKPoint> specialKPoints;
+  if (!YaehmopOut::readBandData(output, bands, kpoints, specialKPoints)) {
+    QString message = tr("Failed to read band structure output from Yaehmop!");
+    QMessageBox::warning(nullptr, tr("Avogadro2"), message);
+    qDebug() << message;
+  }
+
+  qDebug() << "bands.size() is" << bands.size();
 }
 
 QString Yaehmop::createGeometryAndLatticeInput() const
