@@ -17,6 +17,8 @@
 #ifndef AVOGADRO_VTK_VTKPLOT_H
 #define AVOGADRO_VTK_VTKPLOT_H
 
+#include "avogadrovtkexport.h"
+
 #include <array>
 #include <string>
 #include <vector>
@@ -27,7 +29,7 @@ namespace VTK {
 /**
  * @brief Generate and plot using VTK
  */
-class VtkPlot
+class AVOGADROVTK_EXPORT VtkPlot
 {
 public:
   // This function can generate multiple lines on the same chart.
