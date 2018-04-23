@@ -27,7 +27,6 @@
 #include <vtkPlot.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRenderer.h>
-#include <vtkSmartPointer.h>
 #include <vtkTable.h>
 #include <vtkTextProperty.h>
 
@@ -57,11 +56,11 @@ void VtkPlot::generatePlot(const vector<vector<double>>& data,
   // Create a table and add the data as columns
   vtkNew<vtkTable> table;
 
-  vector<vtkSmartPointer<vtkFloatArray>> vtkArrays;
   for (size_t i = 0; i < data.size(); ++i) {
-    vtkArrays.push_back(
-      vtkSmartPointer<vtkFloatArray>(vtkNew<vtkFloatArray>()));
-    table->AddColumn(vtkArrays.back());
+    vtkNew<vtkFloatArray> array;
+    // Unique column names are necessary to prevent vtk from crashing.
+    array->SetName(("Column " + std::to_string(i)).c_str());
+    table->AddColumn(array);
   }
 
   // Find the largest number of rows and set that to be the number of rows

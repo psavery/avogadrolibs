@@ -33,9 +33,9 @@ class AVOGADROVTK_EXPORT VtkPlot
 {
 public:
   // This function can generate multiple lines on the same chart.
-  // data[0] is the x data, and data[i] for any other i is the y data for line
-  // i. 'lineLabels' and 'lineColors' should be equal to the number of lines
-  // (data.size() - 1) and ordered in the same way as they are in 'data'.
+  // data[0] is the x data, and data[i] for i != 0 is the y data for line
+  // i - 1. 'lineLabels' and 'lineColors' should be equal to the number of
+  // lines (data.size() - 1) and ordered in the same way as they are in 'data'.
   static void generatePlot(
                           const std::vector<std::vector<double>>& data,
                           const std::vector<std::string>& lineLabels,
