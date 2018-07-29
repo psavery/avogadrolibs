@@ -50,15 +50,11 @@ if(USE_QT)
     add_subdirectory(molequeue)
     include_directories(${CMAKE_CURRENT_BINARY_DIR}/molequeue)
   endif()
-
   if(USE_VTK)
+    add_subdirectory(vtk)
     include_directories(${CMAKE_CURRENT_BINARY_DIR}/vtk)
   endif()
   add_subdirectory(qtplugins)
-endif()
-
-if(USE_VTK)
-  add_subdirectory(vtk)
 endif()
 
 if(USE_PROTOCALL)

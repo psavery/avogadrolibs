@@ -23,7 +23,6 @@
 #include <string>
 
 #include "array.h"
-#include "atom.h"
 #include "bond.h"
 #include "graph.h"
 #include "variantmap.h"
@@ -34,6 +33,7 @@ namespace Core {
 class BasisSet;
 class Cube;
 class Mesh;
+class Residue;
 class UnitCell;
 
 /** Concrete atom/bond proxy classes for Core::Molecule. @{ */
@@ -474,9 +474,9 @@ public:
   void clearCubes();
 
   /**
-* @brief Get the cubes vector set (if present) for the molecule.
-* @return The cube vector for the molecule
-*/
+   * @brief Get the cubes vector set (if present) for the molecule.
+   * @return The cube vector for the molecule
+   */
   std::vector<Cube*> cubes() { return m_cubes; }
   const std::vector<Cube*> cubes() const { return m_cubes; }
 
@@ -528,10 +528,25 @@ public:
    */
   void perceiveBondsSimple();
 
+  /**
+   * Perceives bonds in the molecule based on preset residue data.
+   */
+  void perceiveBondsFromResidueData();
+
   int coordinate3dCount();
   bool setCoordinate3d(int coord);
-  int coordinate3d() const;
+  Array<Vector3> coordinate3d(int index) const;
   bool setCoordinate3d(const Array<Vector3>& coords, int index);
+
+  /**
+   * Timestep property is used when molecular dynamics trajectories are read
+   */
+  bool setTimeStep(double timestep, int index);
+  double timeStep(int index, bool& status);
+
+  Residue& addResidue(std::string& name, Index& number, char& id);
+  void addResidue(Residue& residue);
+  Residue residue(int index);
 
 protected:
   mutable Graph m_graph;     // A transformation of the molecule to a graph.
@@ -542,6 +557,7 @@ protected:
   Array<Vector2> m_positions2d;
   Array<Vector3> m_positions3d;
   Array<Array<Vector3>> m_coordinates3d; // Used for conformers/trajectories.
+  Array<double> m_timesteps;
   Array<AtomHybridization> m_hybridizations;
   Array<signed char> m_formalCharges;
 
@@ -561,6 +577,7 @@ protected:
 
   BasisSet* m_basisSet;
   UnitCell* m_unitCell;
+  Array<Residue> m_residues;
 
   /** Update the graph to correspond to the current molecule. */
   void updateGraph() const;
@@ -569,15 +586,23 @@ protected:
 class AVOGADROCORE_EXPORT Atom : public AtomTemplate<Molecule>
 {
 public:
-  Atom() : AtomTemplate<Molecule>() {}
-  Atom(Molecule* m, Index i) : AtomTemplate<Molecule>(m, i) {}
+  Atom()
+    : AtomTemplate<Molecule>()
+  {}
+  Atom(Molecule* m, Index i)
+    : AtomTemplate<Molecule>(m, i)
+  {}
 };
 
 class AVOGADROCORE_EXPORT Bond : public BondTemplate<Molecule>
 {
 public:
-  Bond() : BondTemplate<Molecule>() {}
-  Bond(Molecule* m, Index i) : BondTemplate<Molecule>(m, i) {}
+  Bond()
+    : BondTemplate<Molecule>()
+  {}
+  Bond(Molecule* m, Index i)
+    : BondTemplate<Molecule>(m, i)
+  {}
 };
 
 inline unsigned char Molecule::atomicNumber(Index atomId) const

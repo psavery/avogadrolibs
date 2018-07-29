@@ -34,7 +34,7 @@ set_property(GLOBAL PROPERTY AvogadroLibs_PLUGINS)
 set_property(GLOBAL PROPERTY AvogadroLibs_STATIC_PLUGINS)
 
 if(MSVC)
-  add_definitions("-D_CRT_SECURE_NO_WARNINGS" "-DNOMINMAX")
+  add_definitions("-D_CRT_SECURE_NO_WARNINGS" "-DNOMINMAX -D_USE_MATH_DEFINES")
 endif()
 
 include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR}
@@ -48,7 +48,7 @@ option(USE_QT "Enable libraries that use Qt 5" ON)
 option(USE_VTK "Enable libraries that use VTK" OFF)
 option(USE_LIBARCHIVE "Enable optional Libarchive features" ON)
 option(USE_LIBMSYM "Enable optional features using libmsym" ON)
-option(USE_LIBSPG "Enable optional features using libspg" ON)
+option(USE_SPGLIB "Enable optional features using spglib" ON)
 option(USE_PROTOCALL "Enable libraries that use ProtoCall" OFF)
 option(USE_MOLEQUEUE "Enable the MoleQueue dependent functionality" ON)
 option(USE_PYTHON "Use Python to wrap some of our API" OFF)

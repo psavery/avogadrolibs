@@ -64,11 +64,15 @@ void VtkPlot::generatePlot(const vector<vector<double>>& data,
     table->AddColumn(array);
   }
 
-  // Find the largest number of rows and set that to be the number of rows
-  size_t numRows = 0;
-  for (size_t i = 0; i < data.size(); ++i) {
-    if (data[i].size() > numRows)
-      numRows = data[i].size();
+  // All of the rows must be equal in size currently. Otherwise, we get
+  // a garbage plot. We may be able to improve on this in the future.
+  size_t numRows = data[0].size();
+  for (size_t i = 1; i < data.size(); ++i) {
+    if (data[i].size() != numRows) {
+      std::cerr << "Error in " << __FUNCTION__ << ": all of the data must "
+                << "have the same number of rows!\n";
+      return;
+    }
   }
 
   // Put the data in the table
@@ -103,7 +107,7 @@ void VtkPlot::generatePlot(const vector<vector<double>>& data,
   bottomAxis->SetTitle(xTitle);
   leftAxis->SetTitle(yTitle);
 
-  // Increase their title font sizes
+  // Increase the title font sizes
   bottomAxis->GetTitleProperties()->SetFontSize(20);
   leftAxis->GetTitleProperties()->SetFontSize(20);
 
