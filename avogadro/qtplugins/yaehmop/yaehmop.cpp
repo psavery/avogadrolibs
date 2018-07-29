@@ -25,33 +25,33 @@
 #include <QSettings>
 #include <QString>
 
+#include <avogadro/core/array.h>
 #include <avogadro/core/elements.h>
 #include <avogadro/core/unitcell.h>
-#include <avogadro/core/array.h>
 #include <avogadro/core/vector.h>
 #include <avogadro/qtgui/molecule.h>
+#include <avogadro/vtk/vtkplot.h>
 
 #include "banddialog.h"
 #include "yaehmopout.h"
 
 #include "yaehmop.h"
 
+using Avogadro::Vector3;
+using Avogadro::Vector3i;
 using Avogadro::Core::Array;
 using Avogadro::Core::Elements;
 using Avogadro::Core::UnitCell;
 using Avogadro::QtGui::Molecule;
-using Avogadro::Vector3i;
-using Avogadro::Vector3;
 
 namespace Avogadro {
 namespace QtPlugins {
 
 Yaehmop::Yaehmop(QObject* parent_)
   : Avogadro::QtGui::ExtensionPlugin(parent_), m_actions(QList<QAction*>()),
-    m_molecule(nullptr),
-    m_yaehmopSettings(),
-    m_bandDialog(new BandDialog(qobject_cast<QWidget*>(parent()),
-                                m_yaehmopSettings)),
+    m_molecule(nullptr), m_yaehmopSettings(),
+    m_bandDialog(
+      new BandDialog(qobject_cast<QWidget*>(parent()), m_yaehmopSettings)),
     m_displayBandDialogAction(new QAction(this))
 {
   m_displayBandDialogAction->setText(tr("Calculate band structure..."));
@@ -175,9 +175,8 @@ void Yaehmop::displayBandDialog()
   }
 
   if (!m_molecule->unitCell()) {
-    QMessageBox::warning(nullptr,
-                      tr("Avogadro2"),
-                      tr("Cannot calculate band structure: no unit cell!"));
+    QMessageBox::warning(nullptr, tr("Avogadro2"),
+                         tr("Cannot calculate band structure: no unit cell!"));
     qDebug() << "Error in " << __FUNCTION__ << ": there is no unit cell";
     return;
   }
@@ -190,6 +189,44 @@ void Yaehmop::displayBandDialog()
   writeSettings();
 
   calculateBandStructure();
+}
+
+// Get the distance between two k points
+double Yaehmop::kpointDistance(const Vector3& a, const Vector3& b)
+{
+  if (!m_molecule) {
+    qDebug() << "Error in" << __FUNCTION__ << ": the molecule is not set";
+    return -1.0;
+  }
+
+  UnitCell* cell = m_molecule->unitCell();
+  if (!cell) {
+    qDebug() << "Error in " << __FUNCTION__ << ": there is no unit cell";
+    return -1.0;
+  }
+
+  // We need to find the reciprocal space basis vectors, and we
+  // need to find the actual k point location in reciprocal space.
+  const Vector3& aVec = cell->aVector();
+  const Vector3& bVec = cell->bVector();
+  const Vector3& cVec = cell->cVector();
+
+  Vector3 b1 = bVec.cross(cVec);
+  Vector3 b2 = cVec.cross(aVec);
+  Vector3 b3 = aVec.cross(bVec);
+
+  // This is how VASP does it.
+  // If it's good enough for VASP, it's good enough for me!
+  double omega = aVec[0] * b1[0] + aVec[1] * b1[1] + aVec[2] * b1[2];
+
+  b1 /= omega;
+  b2 /= omega;
+  b3 /= omega;
+
+  // Calculate the reciprocal points
+  const Vector3& recA(a[0] * b1 + a[1] * b2 + a[2] * b3);
+  const Vector3& recB(b[0] * b1 + b[1] * b2 + b[2] * b3);
+  return (recA - recB).norm();
 }
 
 void Yaehmop::calculateBandStructure()
@@ -207,9 +244,9 @@ void Yaehmop::calculateBandStructure()
   // This is the number of kpoints connecting each special k point
   input += (QString::number(m_yaehmopSettings.numBandKPoints) + "\n");
   // Num special k points
-  int numSK = m_yaehmopSettings.specialKPoints.split(
-                                     QRegExp("[\r\n]"),
-                                     QString::SkipEmptyParts).size();
+  int numSK = m_yaehmopSettings.specialKPoints
+                .split(QRegExp("[\r\n]"), QString::SkipEmptyParts)
+                .size();
   input += (QString::number(numSK) + "\n"); // num special k points
 
   // Add the whole string from user input
@@ -219,12 +256,10 @@ void Yaehmop::calculateBandStructure()
   QByteArray output;
   QString err;
   if (!executeYaehmop(input.toLocal8Bit(), output, err)) {
-    QMessageBox::warning(nullptr,
-                  tr("Avogadro2"),
-                  tr("Yaehmop execution failed with the following error:\n") +
-                  err);
-    qDebug() << "Yaehmop execution failed with the following error:\n"
-             << err;
+    QMessageBox::warning(
+      nullptr, tr("Avogadro2"),
+      tr("Yaehmop execution failed with the following error:\n") + err);
+    qDebug() << "Yaehmop execution failed with the following error:\n" << err;
     return;
   }
 
@@ -253,8 +288,31 @@ void Yaehmop::calculateBandStructure()
     return;
   }
 
+  // Calculate the k-space distances
+  std::vector<double> xVals{ 0.0 };
+  for (int i = 1; i < numKPoints; ++i)
+    xVals.push_back(kpointDistance(kpoints[i - 1], kpoints[i]) + xVals.back());
 
-  qDebug() << "bands.size() is" << bands.size();
+  // Now generate a plot with the data
+  std::vector<std::vector<double>> data;
+  data.push_back(xVals);
+
+  // We might label bands in the future
+  // std::vector<std::string> lineLabels{ "BandData" };
+  std::vector<std::string> lineLabels;
+  std::array<double, 4> color = { 255, 0, 0, 255 };
+  std::vector<std::array<double, 4>> lineColors;
+  for (const auto& band : bands) {
+    data.push_back(band.toStdVector());
+    lineColors.push_back(color);
+  }
+
+  const char* xTitle = "Special K-Points Go Here";
+  const char* yTitle = "Energy (eV)";
+  const char* windowName = "YAeHMOP Band Structure";
+
+  VTK::VtkPlot::generatePlot(data, lineLabels, lineColors, xTitle, yTitle,
+                             windowName);
 }
 
 QString Yaehmop::createGeometryAndLatticeInput() const
@@ -266,9 +324,8 @@ QString Yaehmop::createGeometryAndLatticeInput() const
 
   UnitCell* cell = m_molecule->unitCell();
   if (!cell) {
-    QMessageBox::warning(nullptr,
-                      tr("Avogadro2"),
-                      tr("Cannot calculate band structure: no unit cell!"));
+    QMessageBox::warning(nullptr, tr("Avogadro2"),
+                         tr("Cannot calculate band structure: no unit cell!"));
     qDebug() << "Error in " << __FUNCTION__ << ": there is no unit cell";
     return "";
   }
@@ -312,8 +369,7 @@ QString Yaehmop::createGeometryAndLatticeInput() const
     // lattice
     if (i == 0) {
       input += "0 0 0\n";
-    }
-    else {
+    } else {
       // We only get here if i > 0.
       // i - 1 is equal to the index of the vector we are looking at.
       for (unsigned short j = 0; j < 3; ++j) {

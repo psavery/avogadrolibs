@@ -38,8 +38,7 @@ int BandDialog::exec()
   m_ui->edit_specialKPoints->setText(m_yaehmopSettings.specialKPoints);
   m_ui->cb_displayYaehmopInput->setChecked(
     m_yaehmopSettings.displayYaehmopInput);
-  m_ui->cb_displayBandData->setChecked(
-    m_yaehmopSettings.displayData);
+  m_ui->cb_displayBandData->setChecked(m_yaehmopSettings.displayData);
   m_ui->cb_limitY->setChecked(m_yaehmopSettings.limitY);
   m_ui->spin_minY->setValue(m_yaehmopSettings.minY);
   m_ui->spin_maxY->setValue(m_yaehmopSettings.maxY);

@@ -25,7 +25,8 @@
 namespace Avogadro {
 namespace QtPlugins {
 
-typedef struct {
+typedef struct
+{
   QString label;
   Vector3 coords;
 } specialKPoint;
@@ -39,8 +40,7 @@ public:
   // necessary. This sets bands, kpoints, and specialKPoints to be the
   // bands, the kpoints, and the special k points. Returns true if the
   // read was successful, and false if the read failed
-  static bool readBandData(const QString& data,
-                           QVector<QVector<double>>& bands,
+  static bool readBandData(const QString& data, QVector<QVector<double>>& bands,
                            QVector<Vector3>& kpoints,
                            QVector<specialKPoint>& specialKPoints);
 };

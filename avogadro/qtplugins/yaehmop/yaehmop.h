@@ -19,6 +19,8 @@
 
 #include <avogadro/qtgui/extensionplugin.h>
 
+#include <avogadro/core/vector.h>
+
 #include <memory>
 
 #include "yaehmopsettings.h"
@@ -58,9 +60,11 @@ private slots:
   void displayBandDialog();
 
 private:
-
   void readSettings();
   void writeSettings();
+
+  // Get the distance between two k points
+  double kpointDistance(const Avogadro::Vector3& a, const Avogadro::Vector3& b);
 
   void calculateBandStructure();
 

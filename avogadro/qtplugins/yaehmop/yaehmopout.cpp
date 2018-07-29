@@ -49,7 +49,7 @@ bool YaehmopOut::readBandData(const QString& data,
     return printAndReturnFalse("Band Data not found in readBandData()!");
 
   // These get printed from the status file and are not needed...
-  foreach(const QString& line, lines) {
+  foreach (const QString& line, lines) {
     if (line.contains("Error value from Diagonalization"))
       lines.removeOne(line);
   }
@@ -74,7 +74,8 @@ bool YaehmopOut::readBandData(const QString& data,
 
   ++ind;
   if (!lines[ind].contains("orbitals in"))
-    return printAndReturnFalse("orbitals in missing");;
+    return printAndReturnFalse("orbitals in missing");
+  ;
   size_t numOrbitals = lines[ind].split(" ")[0].toInt();
 
   for (int i = 0; i < numSpecialPoints; ++i) {
@@ -118,8 +119,7 @@ bool YaehmopOut::readBandData(const QString& data,
       break;
 
     // Read the k-point info
-    if (!lines[ind].contains("K point") ||
-        lines[ind].split(" ").size() < 6) {
+    if (!lines[ind].contains("K point") || lines[ind].split(" ").size() < 6) {
       return printAndReturnFalse("K point missing");
     }
 

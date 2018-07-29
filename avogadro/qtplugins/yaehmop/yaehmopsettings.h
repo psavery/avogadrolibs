@@ -22,21 +22,12 @@
 namespace Avogadro {
 namespace QtPlugins {
 
-struct YaehmopSettings {
-  YaehmopSettings() :
-    numBandKPoints(40),
-    specialKPoints("GM 0 0 0"),
-    displayYaehmopInput(false),
-    displayData(false),
-    limitY(false),
-    minY(0.0),
-    maxY(0.0),
-    plotFermi(false),
-    fermi(0.0),
-    zeroFermi(false),
-    numDim(3)
-  {
-  };
+struct YaehmopSettings
+{
+  YaehmopSettings()
+    : numBandKPoints(40), specialKPoints("GM 0 0 0"),
+      displayYaehmopInput(false), displayData(false), limitY(false), minY(0.0),
+      maxY(0.0), plotFermi(false), fermi(0.0), zeroFermi(false), numDim(3){};
 
   unsigned long long numBandKPoints;
   QString specialKPoints;
