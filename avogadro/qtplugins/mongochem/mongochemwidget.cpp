@@ -21,7 +21,7 @@
 #include "calculationwatcher.h"
 #include "configdialog.h"
 #include "girderrequest.h"
-#include "listmoleculesmodel.h"
+#include "mongochemtreemodel.h"
 #include "mongochem.h"
 #include "submitcalculationdialog.h"
 
@@ -40,10 +40,10 @@ namespace QtPlugins {
 MongoChemWidget::MongoChemWidget(MongoChem* plugin, QWidget* parent)
   : QWidget(parent), m_plugin(plugin), m_ui(new Ui::MongoChemWidget),
     m_networkManager(new QNetworkAccessManager(this)),
-    m_listMoleculesModel(new ListMoleculesModel(this))
+    m_treeModel(new MongoChemTreeModel(this))
 {
   m_ui->setupUi(this);
-  m_ui->tableMolecules->setModel(m_listMoleculesModel.data());
+  m_ui->treeViewMolecules->setModel(m_treeModel.data());
   readSettings();
   setupConnections();
 }
@@ -156,7 +156,7 @@ void MongoChemWidget::search()
 void MongoChemWidget::finishSearch(const QVariant& results)
 {
   // Clear the table
-  m_listMoleculesModel->clear();
+  m_treeModel->clear();
   auto resultList = results.toMap()["results"].toList();
   int matches = resultList.size();
   if (matches == 0) {
@@ -167,13 +167,13 @@ void MongoChemWidget::finishSearch(const QVariant& results)
   }
 
   for (int i = 0; i < matches; ++i) {
-    m_listMoleculesModel->addMolecule(resultList[i].toMap());
+    m_treeModel->addMolecule(resultList[i].toMap());
   }
 }
 
 int MongoChemWidget::selectedRow()
 {
-  auto rows = m_ui->tableMolecules->selectionModel()->selectedRows();
+  auto rows = m_ui->treeViewMolecules->selectionModel()->selectedRows();
   if (rows.isEmpty()) {
     qDebug() << "No row selected!";
     return -1;
@@ -192,8 +192,8 @@ void MongoChemWidget::downloadSelectedMolecule()
     return;
   }
 
-  auto moleculeId = m_listMoleculesModel->moleculeId(row);
-  auto moleculeName = m_listMoleculesModel->moleculeName(row);
+  auto moleculeId = m_treeModel->moleculeId(row);
+  auto moleculeName = m_treeModel->moleculeName(row);
 
   // It would be better if we set the name after downloading the
   // molecule succeeded, but that is currently not easy...
