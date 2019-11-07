@@ -6,7 +6,7 @@ set(srcs
   mongochemwidget.cpp
   girderrequest.cpp
   configdialog.cpp
-  listmoleculesmodel.cpp
+  mongochemtreemodel.cpp
   calculationsubmitter.cpp
   calculationwatcher.cpp
   submitcalculationdialog.cpp

@@ -14,22 +14,24 @@
 
 ******************************************************************************/
 
-#ifndef AVOGADRO_QTPLUGINS_LISTMOLECULESMODEL_H
-#define AVOGADRO_QTPLUGINS_LISTMOLECULESMODEL_H
+#ifndef AVOGADRO_QTPLUGINS_MONGOCHEMTREEMODEL_H
+#define AVOGADRO_QTPLUGINS_MONGOCHEMTREEMODEL_H
 
 #include <QAbstractTableModel>
+#include <QScopedPointer>
 #include <QList>
 #include <QVariantMap>
 
 namespace Avogadro {
 namespace QtPlugins {
 
-class ListMoleculesModel : public QAbstractTableModel
+class MongoChemTreeModel : public QAbstractItemModel
 {
   Q_OBJECT
 
 public:
-  ListMoleculesModel(QObject* parent = nullptr);
+  MongoChemTreeModel(QObject* parent = nullptr);
+  ~MongoChemTreeModel();
   int rowCount(const QModelIndex& parent = QModelIndex()) const override;
   int columnCount(const QModelIndex& parent = QModelIndex()) const override;
   QVariant data(const QModelIndex& index,
@@ -38,6 +40,10 @@ public:
   QVariant headerData(int section, Qt::Orientation orientation,
                       int role) const override;
 
+  QModelIndex parent(const QModelIndex& child) const override;
+  QModelIndex index(int row, int column,
+                    const QModelIndex& parent = QModelIndex()) const override;
+
   QString moleculeId(int row);
   QString moleculeName(int row);
   void addMolecule(const QVariantMap& molecule);
@@ -45,7 +51,11 @@ public:
   void clear();
 
 private:
-  QList<QVariantMap> m_molecules;
+  class TreeItem;
+
+  TreeItem* getItem(const QModelIndex& index) const;
+
+  QScopedPointer<TreeItem> m_rootItem;
 };
 
 } // namespace QtPlugins

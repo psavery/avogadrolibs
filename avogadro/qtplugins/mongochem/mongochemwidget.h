@@ -33,8 +33,8 @@ namespace Avogadro {
 namespace QtPlugins {
 
 class ConfigDialog;
-class ListMoleculesModel;
 class MongoChem;
+class MongoChemTreeModel;
 class SubmitCalculationDialog;
 
 class MongoChemWidget : public QWidget
@@ -76,7 +76,7 @@ private:
   QScopedPointer<Ui::MongoChemWidget> m_ui;
   QSharedPointer<QNetworkAccessManager> m_networkManager;
   QScopedPointer<ConfigDialog> m_configDialog;
-  QScopedPointer<ListMoleculesModel> m_listMoleculesModel;
+  QScopedPointer<MongoChemTreeModel> m_treeModel;
   QScopedPointer<SubmitCalculationDialog> m_submitCalculationDialog;
 };
 
